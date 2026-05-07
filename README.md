@@ -105,6 +105,20 @@ Start the proxy with the public certificate:
 bun run start:public
 ```
 
+On PowerShell, set the domain first:
+
+```powershell
+$env:DOMAIN = "proxy.example.com"
+bun run start:public
+```
+
+On bash/zsh:
+
+```bash
+export DOMAIN=proxy.example.com
+bun run start:public
+```
+
 Connect clients to the hostname, not the IP address:
 
 ```text
