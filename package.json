@@ -1,0 +1,14 @@
+{
+  "name": "bun-https-reverse-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch src/server.js",
+    "start": "bun src/server.js",
+    "start:public": "TLS_CERT=certs/public/${DOMAIN:?set DOMAIN}.fullchain.pem TLS_KEY=certs/public/${DOMAIN:?set DOMAIN}.key bun src/server.js",
+    "cert": "bash scripts/create-cert.sh",
+    "cert:public": "bash scripts/issue-cloudflare-cert.sh",
+    "dns:cloudflare": "bash scripts/set-cloudflare-record.sh"
+  }
+}
