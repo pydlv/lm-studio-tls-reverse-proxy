@@ -44,6 +44,7 @@ Runtime configuration is provided with environment variables:
 TARGET_URL=http://127.0.0.1:1234
 HOST=0.0.0.0
 PORT=8443
+IDLE_TIMEOUT=0
 TLS_CERT=./certs/local-proxy.crt
 TLS_KEY=./certs/local-proxy.key
 ```
@@ -144,3 +145,4 @@ Trust `certs/local-proxy-ca.crt` on client devices. Do not distribute or commit 
 - Keep Cloudflare API tokens in your shell or secret manager, not in the repository.
 - Public certificates validate hostnames, not private LAN IP addresses. Clients must connect to the hostname listed in the certificate.
 - If the proxy runs on the same host as the upstream service, use `TARGET_URL=http://127.0.0.1:1234` so the unencrypted backend hop stays on loopback.
+- `IDLE_TIMEOUT=0` disables Bun's per-request idle timeout, which is useful for long-lived LLM/SSE streaming responses.

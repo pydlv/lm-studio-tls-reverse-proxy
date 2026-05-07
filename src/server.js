@@ -1,6 +1,7 @@
 const target = new URL(Bun.env.TARGET_URL ?? "http://127.0.0.1:1234");
 const hostname = Bun.env.HOST ?? "0.0.0.0";
 const port = Number(Bun.env.PORT ?? "8443");
+const idleTimeout = Number(Bun.env.IDLE_TIMEOUT ?? "0");
 const certFile = Bun.env.TLS_CERT ?? "./certs/local-proxy.crt";
 const keyFile = Bun.env.TLS_KEY ?? "./certs/local-proxy.key";
 
@@ -55,9 +56,22 @@ const server = Bun.serve({
     cert: Bun.file(certFile),
     key: Bun.file(keyFile)
   },
-  async fetch(request) {
+  async fetch(request, server) {
+    server.timeout(request, idleTimeout);
+
     const destination = targetUrlFor(request);
     const headers = copyProxyHeaders(request.headers);
+    const abortController = new AbortController();
+
+    if (request.signal.aborted) {
+      abortController.abort(request.signal.reason);
+    } else {
+      request.signal.addEventListener(
+        "abort",
+        () => abortController.abort(request.signal.reason),
+        { once: true }
+      );
+    }
 
     headers.set("host", target.host);
     headers.set("x-forwarded-host", request.headers.get("host") ?? "");
@@ -68,8 +82,9 @@ const server = Bun.serve({
       const response = await fetch(destination, {
         method: request.method,
         headers,
-        body: request.body,
-        redirect: "manual"
+        body: request.method === "GET" || request.method === "HEAD" ? undefined : request.body,
+        redirect: "manual",
+        signal: abortController.signal
       });
 
       return new Response(response.body, {
