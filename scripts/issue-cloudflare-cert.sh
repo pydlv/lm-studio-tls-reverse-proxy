@@ -34,7 +34,7 @@ if [[ -n "$ACME_EMAIL" ]]; then
 fi
 
 "$ACME_SH" --set-default-ca --server letsencrypt
-"$ACME_SH" --issue --dns dns_cf -d "$DOMAIN" --server letsencrypt
+"$ACME_SH" --issue --dns dns_cf -d "$DOMAIN" --server letsencrypt "$@"
 "$ACME_SH" --install-cert -d "$DOMAIN" \
   --key-file "$CERT_DIR/$DOMAIN.key" \
   --fullchain-file "$CERT_DIR/$DOMAIN.fullchain.pem"
